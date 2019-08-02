@@ -1,5 +1,5 @@
 # Size_and_Area
-ImageJ plugin to open 2 channel deltavision image and measure the size and area of red fluorescent dots in yeast cells. The plugin asks the user to draw round the cell of interest at the correct position in the timelapse. The 2 brightest fluorescent dots in the red channel are automatically selected and measurments made of Intensity and area within the dots. Dot area and mean intensity is then output to a text file for offline analysis.
+ImageJ plugin to open 2 channel images and measure the size and area of red fluorescent dots in yeast cells. The plugin asks the user to draw round the cell of interest at the correct position in the timelapse. The 2 brightest fluorescent dots in the red channel are automatically selected and measurments made of Intensity and area within the dots. Dot area and mean intensity is then output to a text file for offline analysis.
 
 INSTALLATION
 
@@ -19,7 +19,7 @@ INSTALLATION
 
 USAGE
 
-    You will be prompted to Open DV Images. The plugin was written for 2 channel max projected timelapse deltavision images acquired Blue channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
+    You will be prompted to Open Images. The plugin was written for 2 channel max projected timelapse images acquired Blue channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
 
     When the Bio-Formats dialogue opens make sure that the only tick is in Split Channels, nothing else should be ticked.
 
