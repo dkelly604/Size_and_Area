@@ -19,7 +19,7 @@ INSTALLATION
 
 USAGE
 
-    You will be prompted to Open DV Images. The plugin was written for 2 channel timelapse deltavision images acquired Blue channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
+    You will be prompted to Open DV Images. The plugin was written for 2 channel max projected timelapse deltavision images acquired Blue channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
 
     When the Bio-Formats dialogue opens make sure that the only tick is in Split Channels, nothing else should be ticked.
 
