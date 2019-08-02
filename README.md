@@ -11,22 +11,20 @@ INSTALLATION
 
     Create a directory in the C: drive called Temp (case sensitive)
 
-    Using notepad save a blank .txt files called Results.txt and LineResults.txt into the Temp directory you previously created (also case sensitive).
+    Using notepad save a blank .txt file called Results.txt into the Temp directory you previously created (also case sensitive).
 
-    Place YeastLineProfiler_.jar into the plugins directory of your ImageJ installation, a plugin called Dots Lines should appear in the Plugins drop down menu on ImageJ.
+    Place SizeArea_.jar into the plugins directory of your ImageJ installation, a plugin called Size Area should appear in the Plugins drop down menu on ImageJ.
 
-    YeastLineProfiler.java is the editable code for the plugin should improvements or changes be required.
+    SizeArea.txt is the editable code for the plugin should improvements or changes be required.
 
 USAGE
 
-    You will be prompted to Open DV Images. The plugin was written for 2 channel timelapse deltavision images acquired Green channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
+    You will be prompted to Open DV Images. The plugin was written for 2 channel timelapse deltavision images acquired Blue channel then Red Channel. It will probably work on non timelapse images but it will cause problems if the channel order is reversed.
 
     When the Bio-Formats dialogue opens make sure that the only tick is in Split Channels, nothing else should be ticked.
 
-    Once the images have opened you will be prompted to select a timepoint and draw round a cell in the red channel with an interesting dot in it. Draw round the cell and click OK, make sure you get the whole cell in the region as this gives the autothreshold more grey levels to make a good estimation. NOTE be careful not to change the active image to the green channel or you will measure the wrong channel.
+    Once the images have opened you will be prompted to select a timepoint and draw round a cell in the blue channel with an interesting dot in it. Draw round the cell and click OK, make sure you get the whole cell in the region as this gives the autothreshold more grey levels to make a good estimation. NOTE be careful not to change the active image to the red channel or you will measure the wrong channel.
 
     The measurments will be made automatically and you will be asked whether or not you want to measure another cell. The cell numbers of all previously counted cells will be marked on the red image.
 
-    Results are saved to the 2 text files you should have created in C:\Temp
-
-    The LineResults.txt file contains all the values from the line profile in both red and green channels. This was done because the peak finding in the plugin is quite rudimentary and there are far better peak finders available in software such as Matlab or R for more detailed analysis.
+    Results are saved to the text file you should have created in C:\Temp
