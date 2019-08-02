@@ -1,0 +1,180 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.JOptionPane;
+
+import ij.IJ;
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.WaitForUserDialog;
+import ij.measure.Calibration;
+import ij.measure.ResultsTable;
+import ij.plugin.PlugIn;
+import ij.plugin.filter.Analyzer;
+import ij.process.ImageProcessor;
+
+
+public class Size_Area implements PlugIn{
+	ImagePlus Bluey;
+	ImagePlus Reddy;
+	int BlueyID;
+	int ReddyID;
+	double [] xval = new double[300];
+	double [] yval = new double[300];
+	double[] thebluearea = new double[10];
+	double[] thebluemean = new double[10];
+	double[] theredarea = new double[10];
+	double[] theredmean = new double[10];
+	int counter = 1;
+	String filename;
+
+public void run(String arg) {
+
+	/*
+	 * Ask user to open an image and split the channels, requires
+	 * Bio-Formats plugin to be installed. Also sets the measurements
+	 * required for outputs
+	 */
+	IJ.run("Set Measurements...", "area mean min centroid redirect=None decimal=2"); 
+	new WaitForUserDialog("Open DV Image", "Open Images. SPLIT CHANNELS!").show();
+	IJ.run("Bio-Formats Importer");
+	
+	/*
+	 * Assign the filename to a variable so that the 
+	 * results can be labelled in the output text file
+	 */
+	ImagePlus imp = WindowManager.getCurrentImage();
+	filename = imp.getTitle(); 	//Get file name
+	int dotindex = filename.indexOf('.');		
+	filename = filename.substring(0, dotindex + 4);
+	
+	/*
+	 * Automatically assign images to variables, it 
+	 * assumes only 2 channels and that they were acquired
+	 * Blue then Red
+	 */
+	int[] Idlist = new int[2];
+	Idlist = WindowManager.getIDList();
+	IJ.selectWindow(Idlist[0]);
+	int maxLoop = Idlist.length;
+  	
+	for (int x=0; x<maxLoop; x++){
+		int zproject = Idlist[x];
+		IJ.selectWindow(zproject);
+		imp = WindowManager.getCurrentImage();
+
+		if(x==0){
+			Bluey = WindowManager.getCurrentImage();
+			BlueyID = Bluey.getID();
+		}
+		if(x==1){
+			Reddy = WindowManager.getCurrentImage();
+			ReddyID = Reddy.getID();
+		}
+
+	}
+	
+	SelectCells();//Choose cells and analyse them
+	IJ.run("Close All", "");
+	new WaitForUserDialog("Finished", "All Done").show();
+}
+
+public void SelectCells(){
+	String response; 
+	
+	IJ.selectWindow(ReddyID);
+	IJ.run(Reddy, "Enhance Contrast", "saturated=0.45");
+	IJ.setTool("freehand");
+	 
+	/*
+	 * Main method to identify the dots from within the selected
+	 * cell, measure the intensities, area and get the XY coordinates.
+	 * Once the measurements are made the method passes the XY coordinates 
+	 * on to setImageNumbers method to label them to prevent repeats.
+	 */
+	do{
+		IJ.selectWindow(ReddyID);
+		new WaitForUserDialog("Pick One", "Select Timepoint and Draw Round a Cell").show();
+		int tPoint = Reddy.getCurrentSlice();	
+		IJ.run("ROI Manager...", "");	
+		IJ.setAutoThreshold(Reddy, "Yen dark");
+		IJ.run(Reddy, "Analyze Particles...", "size=1.5-Infinity pixel display clear add slice");	
+		ResultsTable rt = new ResultsTable();
+		rt = Analyzer.getResultsTable();
+		int numvals = rt.getCounter();
+		for (int a=0; a<numvals; a++){
+			//RED VALUES
+			theredarea[a] = rt.getValueAsDouble(0, a);
+			theredmean[a] = rt.getValueAsDouble(1, a);
+			xval[counter] = rt.getValueAsDouble(6, 0);
+			yval[counter] = rt.getValueAsDouble(7, 0);
+		}
+		
+		setImageNumbers();		
+		
+		outputinfo(numvals, tPoint);
+		counter++;
+		response = JOptionPane.showInputDialog("Another y/n");
+	}while(response.equals("y"));
+}
+
+public void setImageNumbers(){
+
+	/*
+	 * Method to update the red image with
+	 * the number of cells counted The nuber 
+	 * text is placed next to the cell to which it
+	 * relates
+	 */
+		IJ.setForegroundColor(255, 255, 255);
+		ImageProcessor ip = Reddy.getProcessor();
+		Font font = new Font("SansSerif", Font.PLAIN, 18);
+		ip.setFont(font);
+		ip.setColor(new Color(255, 255, 0));
+		String cellnumber = String.valueOf(counter);
+		int xpos = (int) xval[counter];
+		int ypos = (int) yval[counter];
+		
+		Calibration test = Reddy.getCalibration();
+		double calVal = test.pixelWidth;
+		xpos = (int) (xpos/calVal);
+		ypos = (int) (ypos/calVal);
+		Reddy.setC(1);
+		ip.drawString(cellnumber, xpos, ypos);
+		Reddy.updateAndDraw();
+	
+}
+
+public void outputinfo(int numvals, int tPoint){
+	/*
+	 * Method to output the area and intensities found for each counted cell
+	 * in the form of a text file which can be read by excel 
+	 * or in R 
+	 */
+	String CreateName = "C:\\Temp\\Results.txt";
+	String FILE_NAME = CreateName;
+
+	try{
+		FileWriter fileWriter = new FileWriter(FILE_NAME,true);
+		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+	
+		for (int d = 0; d < numvals; d++){
+		bufferedWriter.write(" File= " + filename + " Cell " + counter + " Time Point " + tPoint + " Red Area " + theredarea[d] + " Red Intensity " + theredmean[d]);
+		bufferedWriter.newLine();
+		}
+		bufferedWriter.newLine();
+		bufferedWriter.close();
+
+	}
+	catch(IOException ex) {
+        System.out.println(
+            "Error writing to file '"
+            + FILE_NAME + "'");
+    }
+} 
+
+
+}
